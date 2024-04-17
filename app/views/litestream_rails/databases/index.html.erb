@@ -1,0 +1,85 @@
+<ul>
+  <% @databases.each do |database| %>
+    <li>
+      <section id="error_12" class="space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="flex items-center gap-2 text-2xl font-bold">
+            <code><%= database['path'] %></code>
+          </h1>
+        </div>
+      </section>
+      <br />
+      <section id="generations" class="-mx-2 mt-4 sm:mx-0 sm:rounded-md">
+        <div class="mb-3 flex items-center justify-between border-b">
+          <h2 class="text-2xl font-bold">Generations</h2>
+          <p class="text-right">Total: <strong><%= database['generations'].size %></strong></p>
+        </div>
+
+        <div class="min-w-full">
+          <% database['generations'].each do |generation| %>
+            <section id="<%= generation['generation'] %>" class="">
+              <details open="open">
+                <summary class="cursor-pointer rounded p-2 hover:bg-gray-50">
+                  <code><%= generation['generation'] %></code>
+                  (<em><%= generation['lag'] %> lag</em>)
+                </summary>
+                <div class="">
+                  <dl class="grid flex-1 grid-cols-2 gap-x-4">
+                    <div class="flex flex-wrap items-center justify-between gap-x-2">
+                      <dt class="font-bold">Start</dt>
+                      <dd class="inline-flex items-center gap-1">
+                        <abbr title="<%= generation['start'] %>" class="cursor-help">
+                          <time datetime="<%= generation['start'] %>"><%= DateTime.parse(generation['start']).to_formatted_s(:db) %></time>
+                        </abbr>
+                      </dd>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-x-2">
+                      <dt class="font-bold">End</dt>
+                      <dd class="inline-flex items-center gap-1">
+                        <abbr title="<%= generation['end'] %>" class="cursor-help">
+                          <time datetime="<%= generation['end'] %>"><%= DateTime.parse(generation['end']).to_formatted_s(:db) %></time>
+                        </abbr>
+                      </dd>
+                    </div>
+                    <div class="col-span-2">
+                      <dt class="font-bold">Snapshots</dt>
+                      <dd class="">
+                        <table class="min-w-full divide-y divide-gray-300">
+                          <thead>
+                            <tr>
+                              <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-3">Created</th>
+                              <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Index</th>
+                              <th scope="col" class="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Size</th>
+                            </tr>
+                          </thead>
+
+                          <tbody class="bg-white">
+                            <% generation['snapshots'].each do |snapshot| %>
+                              <tr class="align-top even:bg-gray-50">
+                                <td scope="col" class="whitespace-nowrap px-3 py-4 pt-7 text-left text-gray-500">
+                                  <abbr title="<%= snapshot['created'] %>" class="cursor-help">
+                                    <time datetime="<%= snapshot['created'] %>"><%= DateTime.parse(snapshot['created']).to_formatted_s(:db) %></time>
+                                  </abbr>
+                                </td>
+                                <td scope="col" class="whitespace-nowrap px-3 py-4 pt-7 text-right text-gray-500">
+                                  <%= snapshot['index'] %>
+                                </td>
+                                <td scope="col" class="whitespace-nowrap px-3 py-4 pt-7 text-right text-gray-500">
+                                  <%= number_to_human_size snapshot['size'] %>
+                                </td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              </details>
+            </section>
+          <% end %>
+        </div>
+      </section>
+    </li>
+  <% end %>
+</ul>
