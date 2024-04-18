@@ -21,12 +21,64 @@ module LitestreamRails
       @password ||= ENV["LITESTREAMRAILS_PASSWORD"] || @@password
     end
 
+    def replicate_process
+      info = {}
+      if !`which systemctl`.empty?
+        systemctl_status = `systemctl status litestream`.chomp
+        # ["● litestream.service - Litestream",
+        #  "     Loaded: loaded (/lib/systemd/system/litestream.service; enabled; vendor preset: enabled)",
+        #  "     Active: active (running) since Tue 2023-07-25 13:49:43 UTC; 8 months 24 days ago",
+        #  "   Main PID: 1179656 (litestream)",
+        #  "      Tasks: 9 (limit: 1115)",
+        #  "     Memory: 22.9M",
+        #  "        CPU: 10h 49.843s",
+        #  "     CGroup: /system.slice/litestream.service",
+        #  "             └─1179656 /usr/bin/litestream replicate",
+        #  "",
+        #  "Warning: some journal files were not opened due to insufficient permissions."]
+        systemctl_status.split("\n").each do |line|
+          line.strip!
+          if line.start_with?("Main PID:")
+            _key, value = line.split(":")
+            pid, _name = value.strip.split(" ")
+            info[:pid] = pid
+          elsif line.start_with?("Active:")
+            _key, value = line.split(":")
+            value, _ago = value.split(";")
+            status, timestamp = value.split(" since ")
+            info[:started] = DateTime.strptime(timestamp.strip, "%Y-%m-%d %H:%M:%S %Z")
+            info[:status] = status.split("(").first.strip
+          end
+        end
+      else
+        litestream_replicate_ps = `ps -a | grep litestream | grep replicate`.chomp
+        litestream_replicate_ps.split("\n").each do |line|
+          next unless line.include?("litestream replicate")
+          pid, * = line.split(" ")
+          info[:pid] = pid
+          state, _, lstart = `ps -o "state,lstart" #{pid}`.chomp.split("\n").last.partition(/\s+/)
+
+          info[:status] = case state.chars.first
+                          when "I" then "idle"
+                          when "R" then "running"
+                          when "S" then "sleeping"
+                          when "T" then "stopped"
+                          when "U" then "uninterruptible"
+                          when "Z" then "zombie"
+                          end
+          info[:started] = DateTime.strptime(lstart.strip, "%a %b %d %H:%M:%S %Y")
+        end
+      end
+      info
+    end
+
     def databases
-      databases = text_table_to_hashes(Litestream::Commands.databases(async: false))
+      databases = Litestream::Commands.databases
 
       databases.each do |db|
-        generations = text_table_to_hashes(Litestream::Commands.generations(db["path"], async: false))
-        snapshots = text_table_to_hashes(Litestream::Commands.snapshots(db["path"], async: false))
+        generations = Litestream::Commands.generations(db["path"])
+        snapshots = Litestream::Commands.snapshots(db["path"])
+        db['path'] = db['path'].gsub(Rails.root.to_s, "[ROOT]")
 
         db['generations'] = generations.map do |generation|
           id = generation["generation"]
@@ -36,13 +88,6 @@ module LitestreamRails
           generation.slice("generation", "name", "lag", "start", "end", "snapshots")
         end
       end
-    end
-
-    private
-
-    def text_table_to_hashes(string)
-      keys, *rows = string.split("\n").map { _1.split(/\s+/) }
-      rows.map { keys.zip(_1).to_h }
     end
   end
 end

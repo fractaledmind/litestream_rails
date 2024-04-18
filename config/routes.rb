@@ -1,5 +1,5 @@
 LitestreamRails::Engine.routes.draw do
-  get "/" => "databases#index", :as => :root
+  get "/" => "processes#show", :as => :root
 
-  resources :databases, only: [:index], path: ""
+  resource :process, only: [:show], path: ""
 end
