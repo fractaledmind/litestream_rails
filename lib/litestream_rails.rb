@@ -58,14 +58,14 @@ module LitestreamRails
           info[:pid] = pid
           state, _, lstart = `ps -o "state,lstart" #{pid}`.chomp.split("\n").last.partition(/\s+/)
 
-          info[:status] = case state.chars.first
-                          when "I" then "idle"
-                          when "R" then "running"
-                          when "S" then "sleeping"
-                          when "T" then "stopped"
-                          when "U" then "uninterruptible"
-                          when "Z" then "zombie"
-                          end
+          info[:status] = case state[0]
+          when "I" then "idle"
+          when "R" then "running"
+          when "S" then "sleeping"
+          when "T" then "stopped"
+          when "U" then "uninterruptible"
+          when "Z" then "zombie"
+          end
           info[:started] = DateTime.strptime(lstart.strip, "%a %b %d %H:%M:%S %Y")
         end
       end
@@ -78,9 +78,9 @@ module LitestreamRails
       databases.each do |db|
         generations = Litestream::Commands.generations(db["path"])
         snapshots = Litestream::Commands.snapshots(db["path"])
-        db['path'] = db['path'].gsub(Rails.root.to_s, "[ROOT]")
+        db["path"] = db["path"].gsub(Rails.root.to_s, "[ROOT]")
 
-        db['generations'] = generations.map do |generation|
+        db["generations"] = generations.map do |generation|
           id = generation["generation"]
           replica = generation["name"]
           generation["snapshots"] = snapshots.select { |snapshot| snapshot["generation"] == id && snapshot["replica"] == replica }
