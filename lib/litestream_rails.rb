@@ -10,13 +10,13 @@ module LitestreamRails
 
   class << self
     # use method instead of attr_accessor to ensure
-    # this works if variable set after SolidErrors is loaded
+    # this works if variable set after LitestreamRails is loaded
     def username
       @username ||= ENV["LITESTREAMRAILS_USERNAME"] || @@username
     end
 
     # use method instead of attr_accessor to ensure
-    # this works if variable set after SolidErrors is loaded
+    # this works if variable set after LitestreamRails is loaded
     def password
       @password ||= ENV["LITESTREAMRAILS_PASSWORD"] || @@password
     end
