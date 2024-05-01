@@ -52,7 +52,7 @@
           <h2 class="text-lg font-bold">
             <code><%= database['path'] %></code>
           </h2>
-          <button type="button" class="rounded-md bg-slate-800 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-700">Restore</button>
+          <%= button_to "Restore", restorations_path, class: "rounded-md bg-slate-800 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-700", params: { database: database['path'] } %>
         </div>
 
         <br />
