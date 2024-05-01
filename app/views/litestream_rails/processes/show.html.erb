@@ -2,24 +2,39 @@
   <div class="flex items-center justify-between">
     <h1 class="flex items-baseline gap-2 text-2xl font-bold">
       Litestream
-      <small class="inline-flex rounded-full bg-green-100 px-2 text-sm font-semibold text-green-800">
-        <%= @process[:status] %>
-      </small>
+
+      <% if @process[:status] == "sleeping" %>
+        <small class="inline-flex rounded-full px-2 text-sm font-semibold bg-yellow-100 text-yellow-800">
+          <%= @process[:status] %>
+        </small>
+      <% elsif @process[:status] %>
+        <small class="inline-flex rounded-full px-2 text-sm font-semibold bg-green-100 text-green-800">
+          <%= @process[:status] %>
+        </small>
+      <% else %>
+        <small class="inline-flex rounded-full px-2 text-sm font-semibold bg-red-100 text-red-800">
+          not running
+        </small>
+      <% end %>
     </h1>
 
-    <small class="text-base">
-      #<code><%= @process[:pid] %></code>
-    </small>
+    <% if @process[:status] %>
+      <small class="text-base">
+        #<code><%= @process[:pid] %></code>
+      </small>
+    <% end %>
   </div>
 
-  <dl class="grid grid-cols-[fit-content(100%)_1fr] gap-x-4">
-    <dt class="font-bold">Started at</dt>
-    <dd class="">
-      <abbr title="<%= @process[:started] %>" class="underline decoration-dashed decoration-gray-500 cursor-help">
-        <time datetime="<%= @process[:started] %>"><%= @process[:started].to_formatted_s(:db) %></time>
-      </abbr>
-    </dd>
-  </dl>
+  <% if @process[:status] %>
+    <dl class="grid grid-cols-[fit-content(100%)_1fr] gap-x-4">
+      <dt class="font-bold">Started at</dt>
+      <dd class="">
+        <abbr title="<%= @process[:started] %>" class="underline decoration-dashed decoration-gray-500 cursor-help">
+          <time datetime="<%= @process[:started] %>"><%= @process[:started].to_formatted_s(:db) %></time>
+        </abbr>
+      </dd>
+    </dl>
+  <% end %>
 </section>
 <br>
 <br>
