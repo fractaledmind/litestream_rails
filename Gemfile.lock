@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    litestream_rails (0.3.0)
+    litestream_rails (0.4.0)
       actionpack (~> 7.0)
       actionview (~> 7.0)
       activesupport (~> 7.0)
