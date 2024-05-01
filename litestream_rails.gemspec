@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   end
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "litestream", "~> 0.5.3"
+  spec.add_dependency "litestream", ">= 0.6.0"
   "~> 7.0".tap do |rails_version|
     spec.add_dependency "actionpack", rails_version
     spec.add_dependency "actionview", rails_version
