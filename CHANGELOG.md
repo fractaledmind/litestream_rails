@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [0.4.1] - 2024-05-01
+
+- Flash messages fade after 5 seconds
+
 ## [0.4.0] - 2024-05-01
 
 - Add support for restoring a database ([@fractaledmind](https://github.com/fractaledmind/litestream_rails/pull/1))
